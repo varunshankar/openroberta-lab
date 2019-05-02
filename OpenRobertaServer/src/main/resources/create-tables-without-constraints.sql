@@ -1,6 +1,7 @@
 create cached table USER (
   ID INTEGER not null,
   ACCOUNT varchar(255) not null,
+  GROUP_ID INTEGER not null,
   PASSWORD  varchar(255) not null,
   EMAIL varchar(255),
   ROLE varchar(32) not null,
@@ -107,6 +108,22 @@ create cached table CONFIGURATION_DATA (
   CONFIGURATION_HASH varchar(255) not null,
   CONFIGURATION_TEXT varchar(16M) not null,
   primary key (CONFIGURATION_HASH)
+);
+
+create cached table GROUP (
+  ID INTEGER not null,
+  NAME varchar(255) not null,
+  OWNER_ID INTEGER not null,
+  CREATED timestamp not null,
+  primary key (ID)
+);
+
+create cached table ACCESS_RIGHT_HISTORY (
+  ID INTEGER not null,
+  GROUP_ID INTEGER not null,
+  CREATED timestamp not null,
+  OLD_ACCESS_RIGHT varchar(255),
+  primary key (ID) 
 );
 
 commit;
