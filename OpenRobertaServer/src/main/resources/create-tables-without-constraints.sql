@@ -1,7 +1,7 @@
 create cached table USER (
   ID INTEGER not null,
+  USERGROUP_ID INTEGER not null,
   ACCOUNT varchar(255) not null,
-  GROUP_ID INTEGER not null,
   PASSWORD  varchar(255) not null,
   EMAIL varchar(255),
   ROLE varchar(32) not null,
@@ -74,7 +74,7 @@ create cached table USER_PROGRAM_LIKE (
   COMMENT varchar(16M)
 );
 
-create table TOOLBOX (
+create cached table TOOLBOX (
   ID INTEGER not null,
   NAME varchar(255) not null,
   OWNER_ID INTEGER,
@@ -110,17 +110,17 @@ create cached table CONFIGURATION_DATA (
   primary key (CONFIGURATION_HASH)
 );
 
-create cached table GROUP (
+create cached table USERGROUP (
   ID INTEGER not null,
-  NAME varchar(255) not null,
   OWNER_ID INTEGER not null,
+  NAME varchar(255) not null,
   CREATED timestamp not null,
   primary key (ID)
 );
 
-create cached table ACCESS_RIGHT_HISTORY (
+create cached table ACCESSRIGHT_HISTORY (
   ID INTEGER not null,
-  GROUP_ID INTEGER not null,
+  USERGROUP_ID INTEGER not null,
   CREATED timestamp not null,
   OLD_ACCESS_RIGHT varchar(255),
   primary key (ID) 
