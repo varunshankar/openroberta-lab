@@ -18,7 +18,7 @@ import de.fhg.iais.roberta.util.dbc.Assert;
  */
 @Entity
 @Table(name = "USER_PROGRAM")
-public class AccessRight implements WithSurrogateId {
+public class UserProgramShare implements WithSurrogateId {
 
     @Id
     @Column(name = "ID")
@@ -42,7 +42,7 @@ public class AccessRight implements WithSurrogateId {
     @Column(name = "RELATION")
     private Relation relation;
 
-    protected AccessRight() {
+    protected UserProgramShare() {
         // Hibernate
     }
 
@@ -53,7 +53,7 @@ public class AccessRight implements WithSurrogateId {
      * @param program the program affected, not null
      * @param relation read or write permission
      */
-    public AccessRight(User user, Program program, Relation relation) {
+    public UserProgramShare(User user, Program program, Relation relation) {
         Assert.notNull(user);
         Assert.notNull(program);
         Assert.notNull(relation);

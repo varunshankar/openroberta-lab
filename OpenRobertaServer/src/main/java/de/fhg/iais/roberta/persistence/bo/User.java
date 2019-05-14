@@ -9,6 +9,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import de.fhg.iais.roberta.util.Encryption;
@@ -24,6 +26,10 @@ public class User implements WithSurrogateId {
 
     @Column(name = "ACCOUNT")
     private String account;
+
+    @ManyToOne
+    @JoinColumn(name = "USERGROUP_ID")
+    private UserGroup userGroup;
 
     @Column(name = "USER_NAME")
     private String userName;
@@ -58,12 +64,13 @@ public class User implements WithSurrogateId {
     }
 
     /**
-     * create a new program
+     * create a new user
      *
      * @param account the system wide unique account of a new user
      */
-    public User(String account) {
+    public User(String account, UserGroup userGroup) {
         this.account = account;
+        this.userGroup = userGroup;
         this.created = Util1.getNow();
         this.lastLogin = Util1.getNow();
     }
@@ -81,6 +88,13 @@ public class User implements WithSurrogateId {
      */
     public String getUserName() {
         return this.userName;
+    }
+
+    /**
+     * @return the userGroup
+     */
+    public UserGroup getUserGroup() {
+        return this.userGroup;
     }
 
     /**

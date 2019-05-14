@@ -8,7 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fhg.iais.roberta.persistence.bo.AccessRight;
+import de.fhg.iais.roberta.persistence.bo.UserProgramShare;
 import de.fhg.iais.roberta.persistence.bo.Program;
 import de.fhg.iais.roberta.persistence.bo.Relation;
 import de.fhg.iais.roberta.persistence.bo.Robot;
@@ -85,9 +85,9 @@ public class PersistUserProgramTest {
         for ( int userNumber = 1; userNumber < PersistUserProgramTest.TOTAL_USERS; userNumber += 2 ) {
             User user = userDao.loadUser("account-" + userNumber);
             if ( user != null ) {
-                AccessRight userProgram = userProgramDao.loadAccessRight(user, program);
+                UserProgramShare userProgram = userProgramDao.loadAccessRight(user, program);
                 if ( userProgram == null ) {
-                    AccessRight userProgram2 = new AccessRight(user, program, Relation.WRITE);
+                    UserProgramShare userProgram2 = new UserProgramShare(user, program, Relation.WRITE);
                     hSession.save(userProgram2);
                     hSession.commit();
                 }
@@ -95,11 +95,11 @@ public class PersistUserProgramTest {
         }
 
         //Show list of users from program dao
-        List<AccessRight> userProgramList = userProgramDao.loadAccessRightsByProgram(program);
+        List<UserProgramShare> userProgramList = userProgramDao.loadAccessRightsByProgram(program);
         Assert.assertTrue(userProgramList.size() == 50);
         for ( int userNumber = 1; userNumber < PersistUserProgramTest.TOTAL_USERS; userNumber += 2 ) {
             User user = userDao.loadUser("account-" + userNumber);
-            List<AccessRight> userProgramList2 = userProgramDao.loadAccessRightsForUser(user, robot);
+            List<UserProgramShare> userProgramList2 = userProgramDao.loadAccessRightsForUser(user, robot);
             Assert.assertTrue(userProgramList2.size() == 1);
         }
     }
