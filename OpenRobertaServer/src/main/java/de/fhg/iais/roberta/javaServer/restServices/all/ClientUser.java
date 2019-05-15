@@ -123,13 +123,14 @@ public class ClientUser {
                 Statistics.info("UserLogout");
             } else if ( cmd.equals("createUser") ) {
                 String account = request.getString("accountName");
+                UserGroup userGroup = request.get
                 String password = request.getString("password");
                 String email = request.getString("userEmail");
                 String userName = request.getString("userName");
                 String role = request.getString("role");
                 //String tag = request.getString("tag");
                 boolean isYoungerThen14 = request.getString("isYoungerThen14").equals("1");
-                up.createUser(account, password, userName, role, email, null, isYoungerThen14);
+                up.createUser(account, userGroup, password, userName, role, email, null, isYoungerThen14);
                 if ( this.isPublicServer && !email.equals("") && up.isOk() ) {
                     String lang = request.getString("language");
                     PendingEmailConfirmations confirmation = pendingConfirmationProcessor.createEmailConfirmation(account);
@@ -178,7 +179,7 @@ public class ClientUser {
                 boolean isExpired = true;
                 if ( lostPassword != null ) {
                     Date currentTime = new Date();
-                    isExpired = (currentTime.getTime() - lostPassword.getCreated().getTime()) / 3600000.0 > 24;
+                    isExpired = ((currentTime.getTime() - lostPassword.getCreated().getTime()) / 3600000.0) > 24;
                 }
                 if ( isExpired ) {
                     up.setSuccess(Key.USER_PASSWORD_RECOVERY_EXPIRED_URL);
@@ -222,7 +223,7 @@ public class ClientUser {
                 String account = request.getString("accountName");
                 String lang = request.getString("language");
                 User user = up.getUser(account);
-                if ( this.isPublicServer && user != null && !user.getEmail().equals("") ) {
+                if ( this.isPublicServer && (user != null) && !user.getEmail().equals("") ) {
                     PendingEmailConfirmations confirmation = pendingConfirmationProcessor.createEmailConfirmation(account);
                     // TODO ask here again for the age
                     sendActivationMail(up, confirmation.getUrlPostfix(), account, user.getEmail(), lang, false);
@@ -246,7 +247,7 @@ public class ClientUser {
                 response.put("rc", "ok");
                 // Util.addResultInfo(response, up); // should not be necessary
 
-            } else if ( cmd.equals("setStatusText") && userId == 1 ) {
+            } else if ( cmd.equals("setStatusText") && (userId == 1) ) {
                 statusText[0] = request.getString("english");
                 statusText[1] = request.getString("german");
                 statusTextTimestamp = request.getLong("timestamp");
@@ -272,11 +273,10 @@ public class ClientUser {
     }
 
     private void sendActivationMail(UserProcessor up, String urlPostfix, String account, String email, String lang, boolean isYoungerThen14) throws Exception {
-        String[] body =
-            {
-                account,
-                urlPostfix
-            };
+        String[] body = {
+            account,
+            urlPostfix
+        };
         try {
             this.mailManagement.send(email, "activate", body, lang, isYoungerThen14);
             up.setSuccess(Key.USER_ACTIVATION_SENT_MAIL_SUCCESS);

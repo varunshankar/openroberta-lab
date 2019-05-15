@@ -6,6 +6,7 @@ import org.hibernate.Query;
 
 import de.fhg.iais.roberta.persistence.bo.Role;
 import de.fhg.iais.roberta.persistence.bo.User;
+import de.fhg.iais.roberta.persistence.bo.UserGroup;
 import de.fhg.iais.roberta.persistence.util.DbSession;
 import de.fhg.iais.roberta.util.dbc.Assert;
 
@@ -28,14 +29,14 @@ public class UserDao extends AbstractDao<User> {
      * @return the created user object; returns <code>null</code> if creation is unsuccessful (e.g. user already exists)
      * @throws Exception
      */
-    public User persistUser(String account, String password, String roleAsString) throws Exception {
+    public User persistUser(String account, UserGroup userGroup, String password, String roleAsString) throws Exception {
         Assert.notNull(account);
         Assert.notNull(password);
         Role role = Role.valueOf(roleAsString);
         Assert.notNull(role);
         User user = loadUser(account);
         if ( user == null ) {
-            user = new User(account);
+            user = new User(account, userGroup);
             user.setPassword(password);
             user.setRole(role);
             this.session.save(user);
@@ -49,8 +50,23 @@ public class UserDao extends AbstractDao<User> {
         Assert.notNull(account);
         Query hql = this.session.createQuery("from User where account=:account");
         hql.setString("account", account);
-
         return checkUserExistance(hql);
+    }
+
+    //TODO: check if it's correct
+    public User loadUserByGroup(UserGroup userGroup) {
+        Assert.notNull(userGroup);
+        Query hql = this.session.createQuery("from User where userGroup=:userGroup");
+        hql.setInteger("userGroup", userGroup.getId());
+        return checkUserExistance(hql);
+    }
+
+    //TODO: check if it's correct
+    public UserGroup loadUserGroup(String account) {
+        Assert.notNull(account);
+        Query hql = this.session.createQuery("from User where account=:account");
+        hql.setString("account", account);
+        return checkUserExistance(hql).getUserGroup();
     }
 
     public User loadUser(int id) {

@@ -24,17 +24,13 @@ public class UserGroup implements WithSurrogateId {
 
     @ManyToOne
     @JoinColumn(name = "OWNER_ID")
-    private User owner;
+    private final User owner;
 
     @Column(name = "NAME")
     private String name;
 
     @Column(name = "CREATED")
-    private Timestamp created;
-
-    protected UserGroup() {
-        // Hibernate
-    }
+    private final Timestamp created;
 
     /**
      * create a new group
@@ -63,6 +59,16 @@ public class UserGroup implements WithSurrogateId {
 
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * set the name
+     *
+     * @return
+     * @return the name, never <code>null</code>
+     */
+    public void setName(String newName) {
+        this.name = newName;
     }
 
     /**

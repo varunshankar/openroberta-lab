@@ -167,7 +167,7 @@ public class User implements WithSurrogateId {
 
     @Override
     public String toString() {
-        return "User [id=" + this.id + ", account=" + this.account + ", userName=" + this.userName + "]";
+        return "User [id=" + this.id + ", group=" + this.userGroup + ", account=" + this.account + ", userName=" + this.userName + "]";
     }
 
 }
