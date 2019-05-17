@@ -12,8 +12,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import de.fhg.iais.roberta.util.*;
-import de.fhg.iais.roberta.util.Statistics;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
@@ -30,9 +28,17 @@ import de.fhg.iais.roberta.persistence.UserProcessor;
 import de.fhg.iais.roberta.persistence.bo.LostPassword;
 import de.fhg.iais.roberta.persistence.bo.PendingEmailConfirmations;
 import de.fhg.iais.roberta.persistence.bo.User;
+import de.fhg.iais.roberta.persistence.bo.UserGroup;
 import de.fhg.iais.roberta.persistence.util.DbSession;
 import de.fhg.iais.roberta.persistence.util.HttpSessionState;
 import de.fhg.iais.roberta.robotCommunication.RobotCommunicator;
+import de.fhg.iais.roberta.util.AliveData;
+import de.fhg.iais.roberta.util.ClientLogger;
+import de.fhg.iais.roberta.util.Key;
+import de.fhg.iais.roberta.util.ServerProperties;
+import de.fhg.iais.roberta.util.Statistics;
+import de.fhg.iais.roberta.util.Util;
+import de.fhg.iais.roberta.util.Util1;
 
 @Path("/user")
 public class ClientUser {
@@ -123,7 +129,8 @@ public class ClientUser {
                 Statistics.info("UserLogout");
             } else if ( cmd.equals("createUser") ) {
                 String account = request.getString("accountName");
-                UserGroup userGroup = request.get
+                //TODO: write something sensible
+                UserGroup userGroup = null;
                 String password = request.getString("password");
                 String email = request.getString("userEmail");
                 String userName = request.getString("userName");
@@ -194,11 +201,10 @@ public class ClientUser {
                 if ( user != null ) {
                     LostPassword lostPassword = lostPasswordProcessor.createLostPassword(user.getId());
                     ClientUser.LOG.info("url postfix generated: " + lostPassword.getUrlPostfix());
-                    String[] body =
-                        {
-                            user.getAccount(),
-                            lostPassword.getUrlPostfix()
-                        };
+                    String[] body = {
+                        user.getAccount(),
+                        lostPassword.getUrlPostfix()
+                    };
                     try {
                         this.mailManagement.send(user.getEmail(), "reset", body, lang, false);
                         up.setSuccess(Key.USER_PASSWORD_RECOVERY_SENT_MAIL_SUCCESS);

@@ -44,7 +44,7 @@ public class PersistEmailConfirmationTest {
         for ( int userNumber = 0; userNumber < PersistEmailConfirmationTest.TOTAL_USERS; userNumber++ ) {
             User user = this.userDao.loadUser("account-" + userNumber);
             if ( user == null ) {
-                User user2 = new User("account-" + userNumber);
+                User user2 = new User(null, "account-" + userNumber);
                 user2.setEmail("stuff-" + userNumber);
                 user2.setPassword("pass-" + userNumber);
                 user2.setRole(Role.STUDENT);

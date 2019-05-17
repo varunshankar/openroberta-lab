@@ -8,12 +8,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fhg.iais.roberta.persistence.bo.UserProgramShare;
 import de.fhg.iais.roberta.persistence.bo.Program;
 import de.fhg.iais.roberta.persistence.bo.Relation;
 import de.fhg.iais.roberta.persistence.bo.Robot;
 import de.fhg.iais.roberta.persistence.bo.Role;
 import de.fhg.iais.roberta.persistence.bo.User;
+import de.fhg.iais.roberta.persistence.bo.UserProgramShare;
 import de.fhg.iais.roberta.persistence.dao.AccessRightDao;
 import de.fhg.iais.roberta.persistence.dao.ProgramDao;
 import de.fhg.iais.roberta.persistence.dao.RobotDao;
@@ -51,7 +51,7 @@ public class PersistUserProgramTest {
         for ( int userNumber = 0; userNumber < PersistUserProgramTest.TOTAL_USERS; userNumber++ ) {
             User user = userDao.loadUser("account-" + userNumber);
             if ( user == null ) {
-                User user2 = new User("account-" + userNumber);
+                User user2 = new User(null, "account-" + userNumber);
                 user2.setEmail("stuff");
                 user2.setPassword("pass-" + userNumber);
                 user2.setRole(Role.STUDENT);

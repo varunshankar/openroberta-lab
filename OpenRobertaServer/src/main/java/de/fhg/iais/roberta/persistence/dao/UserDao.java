@@ -36,7 +36,7 @@ public class UserDao extends AbstractDao<User> {
         Assert.notNull(role);
         User user = loadUser(account);
         if ( user == null ) {
-            user = new User(account, userGroup);
+            user = new User(userGroup, account);
             user.setPassword(password);
             user.setRole(role);
             this.session.save(user);

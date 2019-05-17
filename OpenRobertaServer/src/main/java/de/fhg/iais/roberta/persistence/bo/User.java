@@ -24,12 +24,12 @@ public class User implements WithSurrogateId {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "ACCOUNT")
-    private String account;
-
     @ManyToOne
     @JoinColumn(name = "USERGROUP_ID")
     private UserGroup userGroup;
+
+    @Column(name = "ACCOUNT")
+    private String account;
 
     @Column(name = "USER_NAME")
     private String userName;
@@ -65,10 +65,9 @@ public class User implements WithSurrogateId {
 
     /**
      * create a new user
-     *
      * @param account the system wide unique account of a new user
      */
-    public User(String account, UserGroup userGroup) {
+    public User(UserGroup userGroup, String account) {
         this.account = account;
         this.userGroup = userGroup;
         this.created = Util1.getNow();

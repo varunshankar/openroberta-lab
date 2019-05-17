@@ -1,6 +1,6 @@
 create cached table USER (
   ID INTEGER not null,
-  USERGROUP_ID INTEGER not null,
+  USERGROUP_ID INTEGER,
   ACCOUNT varchar(255) not null,
   PASSWORD  varchar(255) not null,
   EMAIL varchar(255),
