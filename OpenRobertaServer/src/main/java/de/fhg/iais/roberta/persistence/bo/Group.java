@@ -1,13 +1,18 @@
 package de.fhg.iais.roberta.persistence.bo;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -16,7 +21,7 @@ import de.fhg.iais.roberta.util.dbc.Assert;
 
 @Entity
 @Table(name = "USERGROUP")
-public class UserGroup implements WithSurrogateId {
+public class Group implements WithSurrogateId {
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,13 +29,21 @@ public class UserGroup implements WithSurrogateId {
 
     @ManyToOne
     @JoinColumn(name = "OWNER_ID")
-    private final User owner;
+    private User owner;
 
     @Column(name = "NAME")
     private String name;
 
     @Column(name = "CREATED")
-    private final Timestamp created;
+    private Timestamp created;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "USERGROUP_ROBOTS", joinColumns = @JoinColumn(name = "USERGROUP_ID"), inverseJoinColumns = @JoinColumn(name = "ROBOT_ID"))
+    private Set<Robot> robots;
+
+    protected Group() {
+        // Hibernate
+    }
 
     /**
      * create a new group
@@ -38,7 +51,7 @@ public class UserGroup implements WithSurrogateId {
      * @param name the name of the group, not null
      * @param owner the user who created and thus owns the group
      */
-    public UserGroup(String name, User owner) {
+    public Group(String name, User owner) {
         Assert.notNull(name);
         Assert.notNull(owner);
         this.name = name;
@@ -62,17 +75,7 @@ public class UserGroup implements WithSurrogateId {
     }
 
     /**
-     * set the name
-     *
-     * @return
-     * @return the name, never <code>null</code>
-     */
-    public void setName(String newName) {
-        this.name = newName;
-    }
-
-    /**
-     * get the user, who is the owner
+     * get the owner
      *
      * @return the owner, never <code>null</code>
      */
@@ -82,6 +85,27 @@ public class UserGroup implements WithSurrogateId {
 
     public Timestamp getCreated() {
         return this.created;
+    }
+
+    public void addRobot(Robot robot) {
+        if ( this.robots == null ) {
+            this.robots = new HashSet<>();
+        }
+        this.robots.add(robot);
+    }
+
+    public void removeRobot(Robot robot) {
+        if ( this.robots == null ) {
+            this.robots = new HashSet<>();
+        }
+        this.robots.remove(robot);
+    }
+
+    public Set<Robot> getRobots() {
+        if ( this.robots == null ) {
+            this.robots = new HashSet<>();
+        }
+        return new HashSet<>(this.robots);
     }
 
     @Override

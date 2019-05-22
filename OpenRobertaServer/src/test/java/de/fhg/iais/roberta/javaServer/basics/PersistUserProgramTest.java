@@ -49,7 +49,7 @@ public class PersistUserProgramTest {
 
         //Create list of users
         for ( int userNumber = 0; userNumber < PersistUserProgramTest.TOTAL_USERS; userNumber++ ) {
-            User user = userDao.loadUser("account-" + userNumber);
+            User user = userDao.loadUser(null, "account-" + userNumber);
             if ( user == null ) {
                 User user2 = new User(null, "account-" + userNumber);
                 user2.setEmail("stuff");
@@ -65,7 +65,7 @@ public class PersistUserProgramTest {
 
         //Create one program per user
         for ( int userNumber = 0; userNumber < PersistUserProgramTest.TOTAL_USERS; userNumber++ ) {
-            User owner = userDao.loadUser("account-" + userNumber);
+            User owner = userDao.loadUser(null, "account-" + userNumber);
             Program program = programDao.load("program-" + userNumber, owner, robot, owner);
             if ( program == null ) {
                 Program program2 = new Program("program-" + userNumber, owner, robot, owner);
@@ -79,11 +79,11 @@ public class PersistUserProgramTest {
         Assert.assertTrue(programList.size() == 101);
 
         //User 0 invites all inpair  users to write to its program
-        User owner = userDao.loadUser("account-0");
+        User owner = userDao.loadUser(null, "account-0");
         Program program = programDao.load("program-0", owner, robot, owner);
         AccessRightDao userProgramDao = new AccessRightDao(hSession);
         for ( int userNumber = 1; userNumber < PersistUserProgramTest.TOTAL_USERS; userNumber += 2 ) {
-            User user = userDao.loadUser("account-" + userNumber);
+            User user = userDao.loadUser(null, "account-" + userNumber);
             if ( user != null ) {
                 UserProgramShare userProgram = userProgramDao.loadAccessRight(user, program);
                 if ( userProgram == null ) {
@@ -98,7 +98,7 @@ public class PersistUserProgramTest {
         List<UserProgramShare> userProgramList = userProgramDao.loadAccessRightsByProgram(program);
         Assert.assertTrue(userProgramList.size() == 50);
         for ( int userNumber = 1; userNumber < PersistUserProgramTest.TOTAL_USERS; userNumber += 2 ) {
-            User user = userDao.loadUser("account-" + userNumber);
+            User user = userDao.loadUser(null, "account-" + userNumber);
             List<UserProgramShare> userProgramList2 = userProgramDao.loadAccessRightsForUser(user, robot);
             Assert.assertTrue(userProgramList2.size() == 1);
         }

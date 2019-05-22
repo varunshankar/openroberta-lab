@@ -43,7 +43,7 @@ public class ProgramProcessor extends AbstractProcessor {
      */
     public Program getProgram(String programName, String ownerName, String robotName, String authorName) {
         UserDao userDao = new UserDao(this.dbSession);
-        User owner = userDao.loadUser(ownerName);
+        User owner = userDao.loadUser(null, ownerName);
         if ( !Util1.isValidJavaIdentifier(programName) ) {
             setError(Key.PROGRAM_ERROR_ID_INVALID, programName);
             return null;
@@ -51,7 +51,7 @@ public class ProgramProcessor extends AbstractProcessor {
             RobotDao robotDao = new RobotDao(this.dbSession);
             ProgramDao programDao = new ProgramDao(this.dbSession);
             Robot robot = robotDao.loadRobot(robotName);
-            User author = userDao.loadUser(authorName);
+            User author = userDao.loadUser(null, authorName);
             Program program = programDao.load(programName, owner, robot, author);
             if ( program != null ) {
                 setSuccess(Key.PROGRAM_GET_ONE_SUCCESS);
@@ -304,7 +304,7 @@ public class ProgramProcessor extends AbstractProcessor {
      */
     public void deleteByName(String programName, int ownerId, String robotName, String authorName) {
         UserDao userDao = new UserDao(this.dbSession);
-        int authorId = userDao.loadUser(authorName).getId();
+        int authorId = userDao.loadUser(null, authorName).getId();
         deleteByName(programName, ownerId, robotName, authorId);
     }
 
@@ -342,7 +342,7 @@ public class ProgramProcessor extends AbstractProcessor {
         ProgramDao programDao = new ProgramDao(this.dbSession);
         LikeDao likeDao = new LikeDao(this.dbSession);
 
-        User gallery = userDao.loadUser("Gallery");
+        User gallery = userDao.loadUser(null, "Gallery");
         JSONArray programs = new JSONArray();
 
         // Find all the programs which are owned by the gallery

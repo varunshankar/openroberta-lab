@@ -25,10 +25,10 @@ import de.fhg.iais.roberta.main.MailManagement;
 import de.fhg.iais.roberta.persistence.LostPasswordProcessor;
 import de.fhg.iais.roberta.persistence.PendingEmailConfirmationsProcessor;
 import de.fhg.iais.roberta.persistence.UserProcessor;
+import de.fhg.iais.roberta.persistence.bo.Group;
 import de.fhg.iais.roberta.persistence.bo.LostPassword;
 import de.fhg.iais.roberta.persistence.bo.PendingEmailConfirmations;
 import de.fhg.iais.roberta.persistence.bo.User;
-import de.fhg.iais.roberta.persistence.bo.UserGroup;
 import de.fhg.iais.roberta.persistence.util.DbSession;
 import de.fhg.iais.roberta.persistence.util.HttpSessionState;
 import de.fhg.iais.roberta.robotCommunication.RobotCommunicator;
@@ -130,14 +130,14 @@ public class ClientUser {
             } else if ( cmd.equals("createUser") ) {
                 String account = request.getString("accountName");
                 //TODO: write something sensible
-                UserGroup userGroup = null;
+                Group group = null;
                 String password = request.getString("password");
                 String email = request.getString("userEmail");
                 String userName = request.getString("userName");
                 String role = request.getString("role");
                 //String tag = request.getString("tag");
                 boolean isYoungerThen14 = request.getString("isYoungerThen14").equals("1");
-                up.createUser(account, userGroup, password, userName, role, email, null, isYoungerThen14);
+                up.createUser(account, group, password, userName, role, email, null, isYoungerThen14);
                 if ( this.isPublicServer && !email.equals("") && up.isOk() ) {
                     String lang = request.getString("language");
                     PendingEmailConfirmations confirmation = pendingConfirmationProcessor.createEmailConfirmation(account);
@@ -201,10 +201,11 @@ public class ClientUser {
                 if ( user != null ) {
                     LostPassword lostPassword = lostPasswordProcessor.createLostPassword(user.getId());
                     ClientUser.LOG.info("url postfix generated: " + lostPassword.getUrlPostfix());
-                    String[] body = {
-                        user.getAccount(),
-                        lostPassword.getUrlPostfix()
-                    };
+                    String[] body =
+                        {
+                            user.getAccount(),
+                            lostPassword.getUrlPostfix()
+                        };
                     try {
                         this.mailManagement.send(user.getEmail(), "reset", body, lang, false);
                         up.setSuccess(Key.USER_PASSWORD_RECOVERY_SENT_MAIL_SUCCESS);
@@ -279,10 +280,11 @@ public class ClientUser {
     }
 
     private void sendActivationMail(UserProcessor up, String urlPostfix, String account, String email, String lang, boolean isYoungerThen14) throws Exception {
-        String[] body = {
-            account,
-            urlPostfix
-        };
+        String[] body =
+            {
+                account,
+                urlPostfix
+            };
         try {
             this.mailManagement.send(email, "activate", body, lang, isYoungerThen14);
             up.setSuccess(Key.USER_ACTIVATION_SENT_MAIL_SUCCESS);

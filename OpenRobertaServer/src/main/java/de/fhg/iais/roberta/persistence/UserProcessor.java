@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import de.fhg.iais.roberta.persistence.bo.Role;
 import de.fhg.iais.roberta.persistence.bo.User;
-import de.fhg.iais.roberta.persistence.bo.UserGroup;
+import de.fhg.iais.roberta.persistence.bo.Group;
 import de.fhg.iais.roberta.persistence.dao.UserDao;
 import de.fhg.iais.roberta.persistence.util.DbSession;
 import de.fhg.iais.roberta.persistence.util.HttpSessionState;
@@ -19,7 +19,7 @@ public class UserProcessor extends AbstractProcessor {
 
     public User getUser(String account) {
         UserDao userDao = new UserDao(this.dbSession);
-        User user = userDao.loadUser(account);
+        User user = userDao.loadUser(null, account);
         if ( user != null ) {
             setSuccess(Key.USER_GET_ONE_SUCCESS);
             return user;
@@ -38,7 +38,7 @@ public class UserProcessor extends AbstractProcessor {
             return null;
         } else {
             UserDao userDao = new UserDao(this.dbSession);
-            User user = userDao.loadUser(account);
+            User user = userDao.loadUser(null, account);
             if ( (user != null) && user.isPasswordCorrect(password) && !account_check ) {
                 setSuccess(Key.USER_GET_ONE_SUCCESS);
                 return user;
@@ -75,7 +75,7 @@ public class UserProcessor extends AbstractProcessor {
 
     public void createUser(
         String account,
-        UserGroup userGroup,
+        Group userGroup,
         String password,
         String userName,
         String roleAsString,
@@ -96,7 +96,7 @@ public class UserProcessor extends AbstractProcessor {
         } else {
             if ( !isMailUsed(account, email) ) {
                 UserDao userDao = new UserDao(this.dbSession);
-                User user = userDao.persistUser(account, userGroup, password, roleAsString);
+                User user = userDao.persistUser(userGroup, account, password, roleAsString);
                 if ( user != null ) {
                     setSuccess(Key.USER_CREATE_SUCCESS);
                     user.setUserName(userName);
@@ -183,7 +183,7 @@ public class UserProcessor extends AbstractProcessor {
             setError(Key.USER_UPDATE_ERROR_ACCOUNT_WRONG, account);
         } else {
             UserDao userDao = new UserDao(this.dbSession);
-            User user = userDao.loadUser(account);
+            User user = userDao.loadUser(null, account);
             if ( (user != null) && (this.httpSessionState.getUserId() == user.getId()) ) {
                 if ( !isMailUsed(account, email) ) {
                     user.setUserName(userName);
@@ -201,7 +201,7 @@ public class UserProcessor extends AbstractProcessor {
 
     public void deleteUser(String account, String password) throws Exception {
         UserDao userDao = new UserDao(this.dbSession);
-        User user = userDao.loadUser(account);
+        User user = userDao.loadUser(null, account);
         if ( (user != null) && user.isPasswordCorrect(password) ) {
             int rowCount = userDao.deleteUser(user);
             if ( rowCount > 0 ) {

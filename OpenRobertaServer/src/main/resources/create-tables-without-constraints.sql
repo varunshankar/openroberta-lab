@@ -118,6 +118,12 @@ create cached table USERGROUP (
   primary key (ID)
 );
 
+create cached table USERGROUP_ROBOTS (
+  USERGROUP_ID INTEGER not null,
+  ROBOT_ID INTEGER not null,
+  primary key (USERGROUP_ID, ROBOT_ID)
+);
+
 create cached table ACCESSRIGHT_HISTORY (
   ID INTEGER not null,
   USERGROUP_ID INTEGER not null,

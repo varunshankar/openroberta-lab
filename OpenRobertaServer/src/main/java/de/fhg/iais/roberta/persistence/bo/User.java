@@ -26,7 +26,7 @@ public class User implements WithSurrogateId {
 
     @ManyToOne
     @JoinColumn(name = "USERGROUP_ID")
-    private UserGroup userGroup;
+    private Group group;
 
     @Column(name = "ACCOUNT")
     private String account;
@@ -64,12 +64,14 @@ public class User implements WithSurrogateId {
     }
 
     /**
-     * create a new user
-     * @param account the system wide unique account of a new user
+     * create a new user. The pair (group,account) must be unique
+     *
+     * @param group the group the (new) user belongs to. May be null.
+     * @param account the account of a (new) user
      */
-    public User(UserGroup userGroup, String account) {
+    public User(Group group, String account) {
+        this.group = group;
         this.account = account;
-        this.userGroup = userGroup;
         this.created = Util1.getNow();
         this.lastLogin = Util1.getNow();
     }
@@ -90,17 +92,17 @@ public class User implements WithSurrogateId {
     }
 
     /**
-     * @return the userGroup
-     */
-    public UserGroup getUserGroup() {
-        return this.userGroup;
-    }
-
-    /**
      * @param userName the userName to set
      */
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    /**
+     * @return the group this user belongs to (this is not a group, which this user can own)
+     */
+    public Group getGroup() {
+        return this.group;
     }
 
     public String getEmail() {
@@ -148,10 +150,24 @@ public class User implements WithSurrogateId {
         this.lastLogin = Util1.getNow();
     }
 
+    /**
+     * true, if the user has a email, has requested an activation of his/her account, has has shown evidence, that he/she has got the activation email by
+     * clicking a link sent with the email
+     *
+     * @return
+     */
     public boolean isActivated() {
         return this.activated;
     }
 
+    /**
+     * set the activation flag to true or false. Setting to true means,<br>
+     * - the user has a email,<br>
+     * - has requested an activation of his/her account,<br>
+     * - has has shown evidence, that he/she has got the activation email by clicking a link sent with the email
+     *
+     * @param activated true, if the user account IS activated; false, if not activated
+     */
     public void setActivated(boolean activated) {
         this.activated = activated;
     }
@@ -166,7 +182,7 @@ public class User implements WithSurrogateId {
 
     @Override
     public String toString() {
-        return "User [id=" + this.id + ", group=" + this.userGroup + ", account=" + this.account + ", userName=" + this.userName + "]";
+        return "User [id=" + this.id + ", group=" + this.group + ", account=" + this.account + ", userName=" + this.userName + "]";
     }
 
 }
