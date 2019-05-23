@@ -1,4 +1,4 @@
-create unique index userIdx on USER(GROUP_ID, ACCOUNT);
+create unique index groupAccountIdx on USER(USERGROUP_ID, ACCOUNT);
 
 alter table LOST_PASSWORD               add foreign key (USER_ID) references USER(ID) ON DELETE CASCADE;
 alter table PENDING_EMAIL_CONFIRMATIONS add foreign key (USER_ID) references USER(ID) ON DELETE CASCADE;
