@@ -116,7 +116,8 @@ public enum Key {
     GROUP_TO_UPDATE_NOT_FOUND,
     GROUP_UPDATE_ERROR,
     GROUP_ALREADY_EXISTS,
-    GROUP_CREATE_SUCCESS;
+    GROUP_CREATE_SUCCESS,
+    GROUP_RENAME_SUCCESS;
 
     private Key() {
         this.key = "ORA_" + toString();

@@ -44,7 +44,7 @@ public class GroupDao extends AbstractDao<Group> {
     public Pair<Key, Group> persistGroup(String groupName, User owner, Timestamp timestamp) //
     {
         Assert.notNull(groupName);
-        isValidGroupOwner(owner);
+        Assert.isTrue(isAllowedToHaveGroups(owner));
         Group group = load(groupName, owner);
         if ( group == null ) {
             if ( timestamp == null ) {
@@ -69,7 +69,7 @@ public class GroupDao extends AbstractDao<Group> {
      */
     public Group load(String groupName, User owner) {
         Assert.notNull(groupName);
-        isValidGroupOwner(owner);
+        Assert.isTrue(isAllowedToHaveGroups(owner));
         Query hql = this.session.createQuery("from Group where name=:groupName and owner=:owner");
         hql.setString("groupName", groupName);
         hql.setEntity("owner", owner);
@@ -95,29 +95,39 @@ public class GroupDao extends AbstractDao<Group> {
      * @return the list of all userGroups, may be an empty list, but never null
      */
     public List<Group> loadAll(User owner) {
-        Query hql = this.session.createQuery("from UserGroup where owner=:owner");
+        Query hql = this.session.createQuery("from Group g where owner=:owner order by g.name asc");
         hql.setEntity("owner", owner);
         @SuppressWarnings("unchecked")
         List<Group> il = hql.list();
         return Collections.unmodifiableList(il);
     }
 
-    /**
-     * load all userGroups persisted in the database
-     *
-     * @return the list of all userGroup, may be an empty list, but never null
-     */
-    public List<Group> loadAll() {
-        Query hql = this.session.createQuery("from UserGroup");
-        @SuppressWarnings("unchecked")
-        List<Group> il = hql.list();
-        return Collections.unmodifiableList(il);
+    public boolean isAllowedToHaveGroups(User owner) {
+        return (owner != null) && (owner.getEmail() != null) && (owner.getGroup() == null) && (owner.isActivated());
     }
 
-    private void isValidGroupOwner(User owner) {
-        Assert.notNull(owner);
-        Assert.notNull(owner.getEmail());
-        Assert.isNull(owner.getGroup());
-        Assert.isTrue(owner.isActivated());
+    /**
+     * rename a group object that is owned by the User 'owner'. The group to be renamed must exist.
+     *
+     * @param groupName the name of the group, never null
+     * @param newGroupName the new name of the group, never null
+     * @param owner the user who owns this group, never null
+     * @param timestamp timestamp of the last change of the group (if this call is an update of the group); <code>null</code> if a new group is saved
+     * @return a pair of (message-key, group). If the group is persisted successfully, the group is NOT null.
+     */
+    public Pair<Key, Group> renameGroup(String groupName, String newGroupName, User owner, Timestamp timestamp) //
+    {
+        Assert.notNull(groupName);
+        Assert.notNull(newGroupName);
+        Assert.isTrue(isAllowedToHaveGroups(owner));
+        Group group = load(groupName, owner);
+        Assert.notNull(group);
+        Group newGroup = load(newGroupName, owner);
+        if ( newGroup != null ) {
+            return Pair.of(Key.GROUP_ALREADY_EXISTS, null);
+        }
+        group.rename(newGroupName);
+        return Pair.of(Key.GROUP_RENAME_SUCCESS, group);
     }
+
 }

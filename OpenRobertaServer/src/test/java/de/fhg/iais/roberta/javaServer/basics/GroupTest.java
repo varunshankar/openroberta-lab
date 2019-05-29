@@ -3,6 +3,9 @@ package de.fhg.iais.roberta.javaServer.basics;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+import java.util.Random;
+
 import org.hibernate.Session;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -11,10 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
+import de.fhg.iais.roberta.persistence.bo.AccessRight;
 import de.fhg.iais.roberta.persistence.bo.Group;
 import de.fhg.iais.roberta.persistence.bo.Robot;
 import de.fhg.iais.roberta.persistence.bo.User;
 import de.fhg.iais.roberta.persistence.dao.GroupDao;
+import de.fhg.iais.roberta.persistence.dao.GroupWorkflow;
 import de.fhg.iais.roberta.persistence.dao.RobotDao;
 import de.fhg.iais.roberta.persistence.dao.UserDao;
 import de.fhg.iais.roberta.persistence.util.DbExecutor;
@@ -26,10 +31,13 @@ import de.fhg.iais.roberta.util.Pair;
 public class GroupTest {
     private static final Logger LOG = LoggerFactory.getLogger(GroupTest.class);
     private static SessionFactoryWrapper sessionFactoryWrapper;
+    private static Random RANDOM = new Random();
+    private static final String CHARSET_FOR_RANDOM_STRING = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789";
+    private static final int CHARSET_FOR_RANDOM_STRING_LENGTH = CHARSET_FOR_RANDOM_STRING.length();
 
     @BeforeClass
     public static void setup() {
-        sessionFactoryWrapper = new SessionFactoryWrapper("hibernate-cfg.xml", "jdbc:hsqldb:file:./db-3.3.2/openroberta-db");
+        sessionFactoryWrapper = new SessionFactoryWrapper("hibernate-cfg.xml", "jdbc:hsqldb:file:./db-3.4.1/openroberta-db");
         // prepare logger to show result sets
         ((ch.qos.logback.classic.Logger) DbExecutor.LOG).setLevel(Level.DEBUG);
     }
@@ -42,6 +50,7 @@ public class GroupTest {
         dbExecutor.sqlStmt("select * from USER");
         dbExecutor.sqlStmt("select * from USERGROUP");
         dbExecutor.sqlStmt("select * from USERGROUP_ROBOTS");
+        dbExecutor.sqlStmt("select * from ACCESSRIGHT_HISTORY");
 
         LOG.info("***** shutdown the db");
         session.createSQLQuery("shutdown").executeUpdate();
@@ -119,7 +128,29 @@ public class GroupTest {
             session.close();
         }
         {
-            LOG.info("***** step 7: add robots to group with ID = 93");
+            LOG.info("***** step 7: change access right");
+            final DbSession session = sessionFactoryWrapper.getSession();
+            GroupWorkflow groupWorkflow = new GroupWorkflow(session);
+            groupWorkflow.changeGroupAccessRight("testUser", "minscha0", AccessRight.ADMIN_READ);
+            session.commit();
+            session.close();
+        }
+        {
+            LOG.info("***** step 8: rename a group");
+            final DbSession session = sessionFactoryWrapper.getSession();
+            UserDao userDao = new UserDao(session);
+            User testUser = userDao.loadUser(null, "testUser");
+            assertNotNull(testUser);
+            GroupDao groupDao = new GroupDao(session);
+            List<Group> groups = groupDao.loadAll(testUser);
+            Group group = groups.get(0);
+            String newName = group.getName() + getAlphaNumericString(6);
+            group.rename(newName);
+            session.commit();
+            session.close();
+        }
+        {
+            LOG.info("***** step 9: add robots to group with ID = 93");
             final DbSession session = sessionFactoryWrapper.getSession();
             GroupDao groupDao = new GroupDao(session);
             Group minscha = groupDao.get(93);
@@ -133,5 +164,20 @@ public class GroupTest {
             session.commit();
             session.close();
         }
+
+    }
+
+    /**
+     * generate a random string of length n
+     *
+     * @param n the length of the string
+     * @return the random string
+     */
+    private String getAlphaNumericString(int n) {
+        StringBuilder sb = new StringBuilder(n);
+        for ( int i = 0; i < n; i++ ) {
+            sb.append(CHARSET_FOR_RANDOM_STRING.charAt(RANDOM.nextInt(CHARSET_FOR_RANDOM_STRING_LENGTH)));
+        }
+        return sb.toString();
     }
 }

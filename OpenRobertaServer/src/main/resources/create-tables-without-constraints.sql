@@ -114,6 +114,7 @@ create cached table USERGROUP (
   ID INTEGER not null,
   OWNER_ID INTEGER not null,
   NAME varchar(255) not null,
+  ACCESS_RIGHT varchar(32) not null,
   CREATED timestamp not null,
   primary key (ID)
 );
@@ -128,7 +129,7 @@ create cached table ACCESSRIGHT_HISTORY (
   ID INTEGER not null,
   USERGROUP_ID INTEGER not null,
   CREATED timestamp not null,
-  OLD_ACCESS_RIGHT varchar(255),
+  OLD_ACCESS_RIGHT varchar(32) not null,
   primary key (ID) 
 );
 

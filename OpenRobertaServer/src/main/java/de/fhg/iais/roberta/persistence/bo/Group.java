@@ -7,6 +7,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,6 +36,10 @@ public class Group implements WithSurrogateId {
     @Column(name = "NAME")
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ACCESS_RIGHT")
+    private AccessRight accessRight;
+
     @Column(name = "CREATED")
     private Timestamp created;
 
@@ -56,6 +62,7 @@ public class Group implements WithSurrogateId {
         Assert.notNull(owner);
         this.name = name;
         this.owner = owner;
+        this.accessRight = AccessRight.ALL_READ;
         this.created = Util1.getNow();
     }
 
@@ -65,13 +72,31 @@ public class Group implements WithSurrogateId {
     }
 
     /**
-     * get the name
+     * get the name of the group
      *
      * @return the name, never <code>null</code>
      */
 
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * get the access right of the programs related to the group
+     *
+     * @return the access right, never <code>null</code>
+     */
+
+    public AccessRight getAccessRight() {
+        return this.accessRight;
+    }
+
+    /**
+     * set the access right of the programs related to the group
+     */
+
+    public void setAccessRight(AccessRight accessRight) {
+        this.accessRight = accessRight;
     }
 
     /**
@@ -119,5 +144,10 @@ public class Group implements WithSurrogateId {
             + ", created="
             + this.created
             + "]";
+    }
+
+    public void rename(String newGroupName) {
+        Assert.notNull(newGroupName);
+        this.name = newGroupName;
     }
 }

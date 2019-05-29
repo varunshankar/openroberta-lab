@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,7 +17,7 @@ import de.fhg.iais.roberta.util.Util1;
 import de.fhg.iais.roberta.util.dbc.Assert;
 
 @Entity
-@Table(name = "USERGROUP")
+@Table(name = "ACCESSRIGHT_HISTORY")
 public class AccessRightHistory implements WithSurrogateId {
     @Id
     @Column(name = "ID")
@@ -29,8 +31,9 @@ public class AccessRightHistory implements WithSurrogateId {
     @Column(name = "CREATED")
     private Timestamp created;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "OLD_ACCESS_RIGHT")
-    private String oldAccessRight;
+    private AccessRight oldAccessRight;
 
     protected AccessRightHistory() {
         // Hibernate
@@ -41,7 +44,7 @@ public class AccessRightHistory implements WithSurrogateId {
      *
      * @param group the group whose access rights we consider
      */
-    public AccessRightHistory(Group group, String accessRightToSave) {
+    public AccessRightHistory(Group group, AccessRight accessRightToSave) {
         Assert.notNull(group);
         this.group = group;
         this.oldAccessRight = accessRightToSave;
@@ -59,7 +62,7 @@ public class AccessRightHistory implements WithSurrogateId {
      * @return the oldAccessRight, never <code>null</code>
      */
 
-    public String getOldAccessRight() {
+    public AccessRight getOldAccessRight() {
         return this.oldAccessRight;
     }
 
